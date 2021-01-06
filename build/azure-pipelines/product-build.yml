@@ -103,12 +103,15 @@ stages:
           VSCODE_ARCH: x64
         steps:
           - template: product-compile.yml
-      - job: Hygiene
+
+  - stage: PostCompile
+    jobs:
+      - job: PostCompile
         pool: compile
         variables:
           VSCODE_ARCH: x64
         steps:
-          - template: product-hygiene.yml
+          - template: product-postcompile.yml
 
   - ${{ if and(eq(parameters.VSCODE_COMPILE_ONLY, false), eq(variables['VSCODE_BUILD_STAGE_WINDOWS'], true)) }}:
     - stage: Windows
@@ -246,13 +249,13 @@ stages:
   - ${{ if and(eq(variables['VSCODE_PUBLISH'], true), eq(parameters.VSCODE_COMPILE_ONLY, false)) }}:
     - stage: Publish
       dependsOn:
+        - PostCompile
         - ${{ if eq(variables['VSCODE_BUILD_STAGE_WINDOWS'], true) }}:
           - Windows
         - ${{ if eq(variables['VSCODE_BUILD_STAGE_LINUX'], true) }}:
           - Linux
         - ${{ if eq(variables['VSCODE_BUILD_STAGE_MACOS'], true) }}:
           - macOS
-      condition: succeededOrFailed()
       pool:
         vmImage: "Ubuntu-18.04"
       jobs:

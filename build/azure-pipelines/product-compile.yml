@@ -100,13 +100,6 @@ steps:
 
   - script: |
       set -e
-      AZURE_STORAGE_ACCESS_KEY="$(ticino-storage-key)" \
-        node build/azure-pipelines/upload-sourcemaps
-    displayName: Upload sourcemaps
-    condition: and(succeeded(), ne(variables['VSCODE_PUBLISH'], 'false'))
-
-  - script: |
-      set -e
       VERSION=`node -p "require(\"./package.json\").version"`
       AZURE_DOCUMENTDB_MASTERKEY="$(builds-docdb-key-readwrite)" \
         node build/azure-pipelines/common/createBuild.js $VERSION
